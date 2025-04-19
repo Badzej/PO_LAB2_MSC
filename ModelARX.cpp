@@ -1,4 +1,7 @@
 #include "ModelARX.h"
+#include <numeric>
+#include "include_ext_lib/json.hpp"
+#include <fstream>
 
 double ModelARX::generujZaklocenie() const {
     if (sigma == 0.0) return 0.0;
@@ -49,4 +52,8 @@ ModelARX ModelARX::deserializuj(const std::string& sciezka) {
         double sigma = json_obj["sigma"].get<double>();
 
         return ModelARX(a, b, k, sigma);
+}
+
+double ModelARX::pobierzOstatnieWyjscie() const{
+    return y_hist.back();
 }

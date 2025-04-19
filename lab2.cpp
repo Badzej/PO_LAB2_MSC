@@ -7,6 +7,7 @@
 
 #include "RegulatorPID.h"
 #include "ModelARX.h"
+#include "PetlaSprzezeniaZwrotnego.h"
 
 #ifdef DEBUG
 
@@ -223,11 +224,21 @@ using namespace std;
 
 int main()
 {
-	test_RegulatorP_brakPobudzenia(); // dziala dla u*kp
-	test_RegulatorP_skokJednostkowy(); // dziala dla u*kp
+	test_RegulatorP_brakPobudzenia();
+	test_RegulatorP_skokJednostkowy();
 	test_RegulatorPI_skokJednostkowy_1();
 	test_RegulatorPI_skokJednostkowy_2();
 	test_RegulatorPID_skokJednostkowy();
+
+	RegulatorPID regulator(1.0, 0.1, 0.01);
+	ModelARX model({ -0.4 }, { 0.6 }, 1, 0);  // przykładowe współczynniki
+
+	PetlaSprzezeniaZwrotnego krok;
+
+	for (int i = 0; i < 4; i++) {
+		double wyjscie = krok(regulator, model);
+		std::cout << "Krok " << i << " -> Wyjscie: " << wyjscie << std::endl;
+	}
 
 }
 

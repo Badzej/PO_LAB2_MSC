@@ -1,11 +1,8 @@
 #pragma once
 #include <vector>
 #include <queue>
-#include <numeric>
 #include <random>
 #include "ObiektSISO.h"
-#include "include_ext_lib/json.hpp"
-#include <fstream>
 #include "Wielomian.h"
 
 /**
@@ -14,8 +11,8 @@
  * @brief Implementacja dyskretnego modelu ARX
  */
 class ModelARX : public ObiektSISO {
-    Wielomian A; ///Wielomian A(z⁻¹) — wpływ przeszłych wyjść y na bieżące wyjście
-    Wielomian B; ///Wielomian B(z⁻¹) — wpływ przeszłych wejść u na wyjście
+    Wielomian A; ///Wielomian A (z⁻¹) — wpływ przeszłych wyjść y na bieżące wyjście
+    Wielomian B; ///Wielomian B (z⁻¹) — wpływ przeszłych wejść u na wyjście
     std::deque<double> y_hist; ///Historia wartości wyjściowych
     std::deque<double> u_hist; ///Historia wartości wejściowych
     unsigned int k; ///Opóźnienie transportowe (liczba próbek)
@@ -61,4 +58,10 @@ public:
      * @return Obiekt ModelARX zrekonstruowany z pliku
      */
     static ModelARX deserializuj(const std::string& sciezka);
+
+    /**
+     * @brief Zwraca kolejke wartosci wyjscia y
+     * @return Kolejka y_hist
+     */
+    double pobierzOstatnieWyjscie() const;
 };

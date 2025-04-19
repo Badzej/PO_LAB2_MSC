@@ -1,4 +1,5 @@
 #include "Wielomian.h"
+#include <numeric>
 
 Wielomian::Wielomian(const std::vector<double>& wspolczynniki): wsp(wspolczynniki) {};
 
