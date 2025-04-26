@@ -4,5 +4,5 @@
 
 class PetlaSprzezeniaZwrotnego {
 public:
-    double operator()(RegulatorPID& regulator, ModelARX& model, double wartosc_zadana = 1.0) ;
+    [[nodiscard]] double operator()(RegulatorPID& regulator, ModelARX& model, double wartosc_zadana = 1.0) ;
 };

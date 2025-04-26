@@ -1,62 +1,64 @@
 #include "RegulatorPID.h"
-#include <vector>
 #include <iostream>
 
-RegulatorPID::RegulatorPID(double p, double i, double d) : kp(p), ki(i), kd(d){}
+RegulatorPID::RegulatorPID(double p, double i, double d) : k(p), ti(i), td(d){}
 
-RegulatorPID::RegulatorPID(double p, double i): kp(p), ki(i){}
+RegulatorPID::RegulatorPID(double p, double i): k(p), ti(i){}
 
-RegulatorPID::RegulatorPID(double p): kp(p){}
+RegulatorPID::RegulatorPID(double p): k(p){}
 
-bool RegulatorPID::sprawdzCzyDodatnia(double wartosc_spr){
-  if(wartosc_spr >= 0){
-    return true;
-  }
-  return false;
-}
+inline bool RegulatorPID::czyDodatnia(double wartosc_spr) { return wartosc_spr >= 0; }
 
-double RegulatorPID::obliczP(double e){
-  return  e*kp;
+double RegulatorPID::obliczWyjscieP(double e) const{
+  return  e*k;
  }
 
-double RegulatorPID::obliczI(double e){
-   double u = 1.0/ki*(suma_uchybow);
-   if(sprawdzCzyDodatnia(u))
+double RegulatorPID::obliczWyjscieI(double e) {
+   double u = 1.0/ti*(suma_uchybow);
+   if(czyDodatnia(u))
       return u;
    return 0;
   };
 
-double RegulatorPID::obliczD(double e){
-  double u = kd*(e-poprzednia_wartosc);
-  if(sprawdzCzyDodatnia(u))
+double RegulatorPID::obliczWyjscieD(double e){
+  double u = td*(e-poprzedni_uchyb);
+  if(czyDodatnia(u))
     return u;
   return 0;
   };
 
 void RegulatorPID::ustawP(double p){
-  if(sprawdzCzyDodatnia(p))  kp=p;
-  std::cerr << "Nastawa czesci proporcjonalnej nie moze byc ujemna: p=" << p << std::endl;
+  if(czyDodatnia(p))
+    k=p;
+  else
+    std::cerr << "Nastawa czesci proporcjonalnej nie moze byc ujemna: p=" << p << std::endl;
 }
 
 void RegulatorPID::ustawPI(double p, double i){
-  if(sprawdzCzyDodatnia(p) && sprawdzCzyDodatnia(i)) { kp=p; ki=i; }
-  std::cerr << "Nastawy czesci proporcjonalnej i całkującej nie moga byc ujemne: p=" << p << " i=" << i << std::endl;
+  if(czyDodatnia(p) && czyDodatnia(i)) {
+    k=p; ti=i;
+  }
+  else
+    std::cerr << "Nastawy czesci proporcjonalnej i całkującej nie moga byc ujemne: p=" << p << " i=" << i << std::endl;
 }
 
 void RegulatorPID::ustawPID(double p, double i, double d){
-  if(sprawdzCzyDodatnia(p) && sprawdzCzyDodatnia(i) && sprawdzCzyDodatnia(d)) { kp=p; ki=i; kd=d; }
-  std::cerr << "Nastawy czesci proporcjonalnej, całkującej i rozniczkujacej nie moga byc ujemne: p=" << p << " i=" << i << " d=" << d << std::endl;
+  if(czyDodatnia(p) && czyDodatnia(i) && czyDodatnia(d)) {
+    k=p; ti=i; td=d;
+  }
+  else
+   std::cerr << "Nastawy czesci proporcjonalnej, całkującej i rozniczkujacej nie moga byc ujemne: p=" << p << " i=" << i << " d=" << d << std::endl;
 }
 
 double RegulatorPID::symuluj(double e){
   double u=0;
   suma_uchybow += e;
-  if(ki == 0 && kd == 0)
-    u = obliczP(e);
-  else if (kd == 0)
-    u = obliczP(e)+ obliczI(e);
+  if(ti == 0 && td == 0)
+    u = obliczWyjscieP(e);
+  else if (td == 0)
+    u = obliczWyjscieP(e)+ obliczWyjscieI(e);
   else
-    u = obliczP(e) + obliczI(e) + obliczD(e);
-  poprzednia_wartosc = e;
+    u = obliczWyjscieP(e) + obliczWyjscieI(e) + obliczWyjscieD(e);
+  poprzedni_uchyb = e;
   return u;
 }
