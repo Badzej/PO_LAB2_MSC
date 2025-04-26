@@ -1,5 +1,5 @@
 #include "PetlaSprzezeniaZwrotnego.h"
-    double PetlaSprzezeniaZwrotnego::operator()(RegulatorPID& regulator, ModelARX& model, double wartosc_zadana) {
+    double PetlaSprzezeniaZwrotnego::operator()(RegulatorPID& regulator, ModelARX& model,const double wartosc_zadana) {
 
         double poprzednie_wyjscie = model.pobierzOstatnieWyjscie();
 

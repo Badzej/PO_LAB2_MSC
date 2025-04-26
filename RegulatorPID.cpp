@@ -1,31 +1,53 @@
 #include "RegulatorPID.h"
 #include <iostream>
 
-RegulatorPID::RegulatorPID(double p, double i, double d) : k(p), ti(i), td(d){}
+RegulatorPID::RegulatorPID(double p, double i, double d) {
+  if (czyDodatnia(p) && czyDodatnia(i) && czyDodatnia(d)) {
+    k = p;
+    ti = i;
+    td = d;
+  } else {
+    std::cerr << "Blad: Wszystkie nastawy musza byc dodatnie!" << std::endl;
+  }
+}
 
-RegulatorPID::RegulatorPID(double p, double i): k(p), ti(i){}
+RegulatorPID::RegulatorPID(double p, double i) {
+  if (czyDodatnia(p) && czyDodatnia(i)) {
+    k = p;
+    ti = i;
+  } else {
+    std::cerr << "Blad: Wszystkie nastawy musza byc dodatnie!" << std::endl;
+  }
+}
 
-RegulatorPID::RegulatorPID(double p): k(p){}
+RegulatorPID::RegulatorPID(double p) {
+  if (czyDodatnia(p)) {
+    k = p;
+  } else {
+    std::cerr << "Blad: Wszystkie nastawy musza byc dodatnie!" << std::endl;
+  }
+}
 
-inline bool RegulatorPID::czyDodatnia(double wartosc_spr) { return wartosc_spr >= 0; }
+bool RegulatorPID::czyDodatnia(double wartosc_spr) { return wartosc_spr >= 0; }
 
 double RegulatorPID::obliczWyjscieP(double e) const{
   return  e*k;
- }
+}
 
 double RegulatorPID::obliczWyjscieI(double e) {
+   if (ti == 0) return 0; // Chronimy się przed dzieleniem przez 0
    double u = 1.0/ti*(suma_uchybow);
    if(czyDodatnia(u))
       return u;
    return 0;
-  };
+}
 
 double RegulatorPID::obliczWyjscieD(double e){
   double u = td*(e-poprzedni_uchyb);
   if(czyDodatnia(u))
     return u;
   return 0;
-  };
+}
 
 void RegulatorPID::ustawP(double p){
   if(czyDodatnia(p))
@@ -51,14 +73,12 @@ void RegulatorPID::ustawPID(double p, double i, double d){
 }
 
 double RegulatorPID::symuluj(double e){
-  double u=0;
+  double u = obliczWyjscieP(e);
   suma_uchybow += e;
-  if(ti == 0 && td == 0)
-    u = obliczWyjscieP(e);
-  else if (td == 0)
-    u = obliczWyjscieP(e)+ obliczWyjscieI(e);
-  else
-    u = obliczWyjscieP(e) + obliczWyjscieI(e) + obliczWyjscieD(e);
+  if (ti > 0)
+    u += obliczWyjscieI(e);
+  if (td > 0)
+    u += obliczWyjscieD(e);
   poprzedni_uchyb = e;
   return u;
 }
